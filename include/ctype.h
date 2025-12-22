@@ -10,6 +10,7 @@ extern int tolower(int __c);
 extern int isalnum(int __c);
 extern int isalpha(int __c);
 extern int isascii(int __c);
+extern int isatty(int __c);
 extern int isblank(int __c);
 extern int iscntrl(int __c);
 extern int isdigit(int __c);
