@@ -30,20 +30,43 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#define IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
+
 void putchar(char c);
 
 static char _buf[16]; // largest number is 15 digits long
 
 /* -1 returned means erro of some sort */
-int format_integer(char *dst, int16_t val, uint8_t base, uint8_t s) {
+int format_integer(char *dst, int16_t val, uint8_t base, uint8_t s, uint8_t width, uint8_t zeroPad) {
   uint8_t l;
   uint8_t j;
+  char pad;
   l = 0;
+
+  // Convert the number to ascii
   if (s)
     itoa(val, _buf, base);
   else
     uitoa(val, _buf);
 
+  // Calculate how much padding is needed and output it.
+  if (width){
+    for (j = 0; _buf[j] != '\0'; j++) {
+      ;
+    }
+    width = width - j;
+    if (zeroPad)
+      pad = '0';
+    else 
+      pad = ' ';
+
+    for (j = 0; j < width; j++) {
+      if (dst == NULL) putchar(pad);
+      else *dst++ = pad;
+      l++;
+    }
+  }
+  
   for (j = 0; _buf[j] != '\0'; j++) {
     if (dst == NULL) putchar(_buf[j]);
     else *dst++ = _buf[j];
@@ -64,7 +87,19 @@ int _printf(char *dst, const char *format) {
 
   for (i = 0; format[i] != '\0'; i++) {
     if (format[i] == '%') {
+      int width = 0;
+      int zero_pad = 0;
       i++;
+      // check for '0' flag
+      if (format[i] == '0') {
+          zero_pad = 1;
+          i++;
+      }
+      // parse width (e.g., the '4' in %04x)
+      while (IS_DIGIT(format[i])) {
+          width = width * 10 + (format[i] - '0');
+          i++;
+      }
       // char literal
       if (format[i] == 'c') {
         c = va_arg(arg_list, unsigned char);
@@ -88,7 +123,7 @@ int _printf(char *dst, const char *format) {
       // signed 16 bit decimal
       if (format[i] == 'd') {
         val = va_arg(arg_list, size_t);
-        j = format_integer(dst, val, 10, 1);
+        j = format_integer(dst, val, 10, 1, width, 0);
         if (j == -1)
           return -1;
         len += j;
@@ -98,7 +133,7 @@ int _printf(char *dst, const char *format) {
       // unsigned 16 bit decimal
       if (format[i] == 'u') {
         val = va_arg(arg_list, size_t);
-        j = format_integer(dst, val, 10, 0);
+        j = format_integer(dst, val, 10, 0, width, 0);
         if (j == -1)
           return -1;
         len += j;
@@ -108,7 +143,7 @@ int _printf(char *dst, const char *format) {
       // unsigned 16 bit hexadecimal
       if (format[i] == 'x') {
         val = va_arg(arg_list, size_t);
-        j = format_integer(dst, val, 16, 1);
+        j = format_integer(dst, val, 16, 1, width, zero_pad);
         if (j == -1)
           return -1;
         len += j;

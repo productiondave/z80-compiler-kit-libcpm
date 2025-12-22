@@ -16,7 +16,7 @@ int main()
     c = cpm_dc_in();
     if (c)
     {
-      printf("\nKEY: %x = %c", c, c);
+      printf("\nKEY: %02x = %c", c, c);
       if (c == 0x1b) {
         running = false;
       }
@@ -24,7 +24,7 @@ int main()
     j0 = joy(0);
     if (j0 != j1)
     {
-      printf("\nJOY: %x",j0);
+      printf("\nJOY: %02x",j0);
       j1 = j0;
     }
   }

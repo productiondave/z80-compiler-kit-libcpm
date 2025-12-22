@@ -19,7 +19,7 @@ int main()
   }
   puts("\n");
 
-  printf("argc = %d\n", argc);
+  printf("argc = %5d\n", argc);
 
   printf("argv[argc] = %s\n", (argv[argc] == 0) ? "NULL" : "NOT NULL"); // dereference a null pointer
   puts("\npress a key\n");
