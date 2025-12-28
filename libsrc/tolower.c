@@ -19,44 +19,16 @@
 *    USA
 *
 * https://github.com/linuxplayground/z80-compiler-kit-libcpm
-*
+* - Copied from FUZIX
 *****************************************************************************
 */
-
-#ifndef _STRING_H
-#define _STRING_H
-
-#include <stddef.h>
-#include <stdbool.h>
 #include <stdint.h>
 
-/* Convert all lowercase letters to uppercase.  Other characters are unchanged
- */
-char toupper(char c);
-/* Convert all uppercase letters to lowercase.  Other characters are unchanged
- */
-char tolower(char c);
+int tolower(int c)
+{
+	uint8_t cb = c;
+	if ((cb >= 'A') && (cb <= 'Z'))
+		cb ^= 0x20;
+	return cb;
+}
 
-
-/* These externs are all provided by the Fuzix-Compiler-Kit but for some reason
- * a header is not provided for them.  So one is provided here.
- */
-
-void *memcpy(void *dst, void *src, size_t len);
-void *memset(void *dest, int data, size_t len);
-int memcmp(const void *s1, const void *s2, size_t n);
-
-int strcmp(const char *s1, const char *s2);
-int strncmp(const char *s1, const char *s2, size_t n);
-
-char *strchr(const char *s, int c);
-char *strrchr(const char *s, int c);
-char *strcpy(char *dst, const char *src);
-
-size_t strlen(const char *s);
-
-char *strtok(char *s, const char *delim);
-size_t strspn(const char *s, const char *accept);
-char *strpbrk(const char *str, const char *set);
-
-#endif //_STRING_H

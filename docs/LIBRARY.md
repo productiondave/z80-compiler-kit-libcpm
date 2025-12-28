@@ -54,7 +54,7 @@ keyboard input.  This is useful in games where a blocking input is not desired.
 
 ## STDLIB
 
-- [stdlib.h](../lib/stdlib.h)
+- [stdlib.h](../include/stdlib.h)
 
 These functions in STDLIB are some of the simpler ones that might be useful on
 an 8-bit system.
@@ -71,10 +71,13 @@ an 8-bit system.
     - void puts(char *s);
     - bool kbhit(); Alias to cpm_const()
 
+## CTYPE
+
+See the [ctype.h](../include/ctype.h) for details.
 
 ## FCNTL
 
-- [fcntl.h](../lib/fcntl.h)
+- [fcntl.h](../include/fcntl.h)
 
 File abstraction for CPM file IO.  There can only be 4 files open at once.
 
@@ -163,8 +166,12 @@ Only the following format specifiers are supported:
 %s - Null terminated string
 %u - Unsigned INT ( 16 bits - DECIMAL)
 %d - Signed INT ( 16 bits - DECIMAL)
-%s - Unsigned INT (16 bits - HEX)
+%x - Unsigned INT (16 bits - HEX)
 ```
+
+Zero padding is supported in `%x` like this: `%2x`.
+
+Left-space padding is supported in the various decimal formatters like this: `%6d`.
 
 ### STRING
 
@@ -174,6 +181,7 @@ The string functions are all pretty much as you'd expect them to be.  This is
 the full list.
 
     - char toupper(char c);
+    - char to(char c);
     - void *memcpy(void *dst, void *src, size_t n);
     - void *memset(void *dest, uint8_t c, size_t n);
     - int8_t memcmp(void *s1, void *s2, size_t n);
@@ -303,8 +311,8 @@ a sprite sheet.
 
 Read and write data to video memory at the currently defined address.
 
-- void tms_put(uint8_t b);
-- uint8_t tms_get();
+    - void tms_put(uint8_t b);
+    - uint8_t tms_get();
 
 ### Framebuffer Routines
 
