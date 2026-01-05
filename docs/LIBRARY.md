@@ -34,10 +34,8 @@ The following points apply:
 program.  If the exit code given is 0, the program returns to CP/M normally.  If
 the value is non-zero, the library will print the HEX value before returning to
 CP/M.
-- arguments are not populated into `argc` and `argv[]`.
-    - If you want to work with arguments, you can do so explicitly with the
-    `uint8_t cpm_parse_args(char **argv, uint8_t max_args);` function.  An
-    example of this is provided in the [args example](../examples/args/args.c).
+- Arguments are passed to main with the following signature: `int main(int argc,
+  char **argv)`
 
 ## CPM
 
@@ -131,27 +129,7 @@ addressable range.
 ## STDARG
 
 - [stdarg.h](../lib/stdarg.h)
-- [cpm.h](../lib/cpm.h)
 
-Rather than bake a whole bunch of extra functionality into crt0, I have decided
-that standard arguments can be called independently of the main() routine.  In
-other words, this library does not automatically populate `argc` and `**argv`
-into the `main()` parameters.
-
-To process command line arguments you can do something like this:
-
-```c
-#include <cpm.h>
-
-#define MAX_ARGS 4
-
-void main()
-{
-    char *argv[MAX_ARGS];
-    uint8_t argc = cpm_parse_args(argv, MAX_ARGS);
-    ...
-}
-```
 ## STDIO
 
 - [stdio.h](../lib/stdio.h)
