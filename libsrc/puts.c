@@ -27,6 +27,6 @@
 
 void puts(char *s) {
   do {
-    putchar(*s);
-  } while (*s++ != 0);
+    putchar(*s++);
+  } while (*s != 0);
 }

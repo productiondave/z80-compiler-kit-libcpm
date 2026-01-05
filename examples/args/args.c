@@ -12,14 +12,14 @@ int main(int argc, char **argv)
 
   for (i=0; i<argc; i++)
   {
-    puts("\n");
     puts(argv[i]);
+    puts("\n");
   }
+
   puts("\n");
 
   printf("argc = %5d\n", argc);
-
   printf("argv[argc] = %s\n", (argv[argc] == 0) ? "NULL" : "NOT NULL"); // dereference a null pointer
-  puts("\npress a key\n");
+
   return 0;
 }
