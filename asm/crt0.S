@@ -21,6 +21,16 @@
 ; https://github.com/linuxplayground/z80-compiler-kit-libcpm
 ;
 ;****************************************************************************
+
+COMMAND_TAIL_LEN equ 0x80
+COMMAND_TAIL     equ 0x81
+MAX_ARGS         equ 16
+
+  .bss
+
+_argc:        .word 0
+_argv_table:  .ds MAX_ARGS * 2
+
   .code
 #ifndef NABU
   di    ; disable interrupts on everything.
@@ -32,6 +42,76 @@
   call  init_nabu
 #endif
   call  __init_sys
+  call  parse_cpm_tail
+  ld    hl,_argv_table
+  push  hl
+  ld    hl,(_argc)
+  push  hl
   call  _main
   jp    0
 
+
+parse_cpm_tail:
+  ld    a,(COMMAND_TAIL_LEN)    ; get length of tail
+  or    a
+  jr    z, no_args
+  ld    b, a
+  ld    hl, COMMAND_TAIL
+  ld    ix, _argv_table
+  ld    de, 0
+
+  ; handle argv[0] - CP/M doesn't provide the program name
+  ld    hl, dummy_name
+  ld    (ix+0),l
+  ld    (ix+1),h
+  inc   de
+  inc   ix
+  inc   ix
+
+  ld    hl, COMMAND_TAIL ; reset HL to start of tail
+
+parse_loop:
+  ; 1. skip leading whitespace
+skip_space:
+  ld    a,(hl)
+  cp    ' '
+  jr    nz,find_word_end
+  inc   hl
+  djnz  skip_space
+  jr    finish_parse
+
+find_word_end:
+  ; 2. found a word! save address to argv table
+  ld    (ix+0),l
+  ld    (ix+1),h
+  inc   de          ; increment argc
+  inc   ix
+  inc   ix
+
+scan_word:
+  ld    a,(hl)
+  cp    ' '
+  jr    z,terminate_word
+  inc   hl
+  djnz  scan_word
+  jr    finish_parse
+
+terminate_word:
+  ld    (hl), 0
+  inc   hl
+  djnz  parse_loop
+
+finish_parse:
+  ld    (_argc),de
+  ret
+
+no_args:
+  ld    hl,1
+  ld    (_argc),hl
+  ld    hl,dummy_name
+  ld    (_argv_table),hl
+  ret
+
+.data
+dummy_name: .ascii"program"
+            .byte 0
