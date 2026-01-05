@@ -30,6 +30,7 @@ MAX_ARGS         equ 16
 
 _argc:        .word 0
 _argv_table:  .ds MAX_ARGS * 2
+_cmdcopy:     .ds 128
 
   .code
 #ifndef NABU
@@ -42,6 +43,7 @@ _argv_table:  .ds MAX_ARGS * 2
   call  init_nabu
 #endif
   call  __init_sys
+  call  copy_cmd_tail
   call  parse_cpm_tail
   ld    hl,_argv_table
   push  hl
@@ -50,13 +52,23 @@ _argv_table:  .ds MAX_ARGS * 2
   call  _main
   jp    0
 
+copy_cmd_tail:
+  ld    a, (COMMAND_TAIL_LEN)
+  or    a
+  ret   z
+  ld    c, a
+  ld    b, 0
+  ld    de, _cmdcopy
+  ld    hl, COMMAND_TAIL
+  ldir
+  ret
 
 parse_cpm_tail:
   ld    a,(COMMAND_TAIL_LEN)    ; get length of tail
   or    a
   jr    z, no_args
   ld    b, a
-  ld    hl, COMMAND_TAIL
+  ld    hl, _cmdcopy
   ld    ix, _argv_table
   ld    de, 0
 
@@ -68,7 +80,7 @@ parse_cpm_tail:
   inc   ix
   inc   ix
 
-  ld    hl, COMMAND_TAIL ; reset HL to start of tail
+  ld    hl, _cmdcopy ; reset HL to start of tail
 
 parse_loop:
   ; 1. skip leading whitespace
