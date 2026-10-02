@@ -9,7 +9,9 @@ SUBDIRS = \
 					ay38910 \
 					sprites \
 					sptest \
-					cpmdcout
+					cpmdcout \
+					highres \
+					snakemc
 
 CLEAN_DIRS=$(SUBDIRS:%=clean-%)
 ALL_DIRS=$(SUBDIRS:%=all-%)

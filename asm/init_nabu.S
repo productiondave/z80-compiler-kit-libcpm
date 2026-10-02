@@ -63,7 +63,7 @@ ay_write:
 
 init_nabu:
   ;Turn off the rom
-  ld    a,0x03 ;CONTROL_ROMSEL|CONTROL_VDOBUF
+  ld    a,0x03          ;CONTROL_ROMSEL|CONTROL_VDOBUF
   out   (IO_CONTROL),a
   di    ; disable interrupts
 
@@ -77,7 +77,7 @@ init_nabu:
 
   ld    a,IO_PORTA
   call  ay_read         ; get the current interrupt mask from AY Port A
-  or    0x30; INT_MASK_KEYBOARD|INT_MASK_VDP
+  or    0x30            ; INT_MASK_KEYBOARD|INT_MASK_VDP
   ld    c,a
   ld    b,IO_PORTA
   call  ay_write

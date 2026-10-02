@@ -2,17 +2,17 @@
 
 The order of this list is completely meaningless.
 
-- [ ] General
+- [x] General
     - ~[ ] Finalize IO ports for Retro and Nouveau to support ROM WBW~
-    - [X] Rework build system to build all the targets at once or just specific
+    - [x] Rework build system to build all the targets at once or just specific
         targets
-    - [X] Rework build system to have target specific source files.
-    - [X] Install scripts
-    - [X] Work on improving documentation - it's currently a MESS!
+    - [x] Rework build system to have target specific source files.
+    - [x] Install scripts
+    - [x] Work on improving documentation - it's currently a MESS!
 - [x] TARGET: NABU
     - [x] NABU Memory mapped IO for joystick status.
 
-- [ ] stdlib
+- [x] stdlib
     - [x] kbhit ?
     - [x] putchar / outch - do translation of `\n` to `\r\n`
 
