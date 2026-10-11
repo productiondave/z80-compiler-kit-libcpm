@@ -11,7 +11,8 @@ SUBDIRS = \
 					sptest \
 					cpmdcout \
 					highres \
-					snakemc
+					snakemc \
+					tmstxt
 
 CLEAN_DIRS=$(SUBDIRS:%=clean-%)
 ALL_DIRS=$(SUBDIRS:%=all-%)

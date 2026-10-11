@@ -1,3 +1,8 @@
+#ifndef TMS_PATTERNS_H
+#define TMS_PATTERNS_H
+
+#define TMS_PATTERNS_LEN 0x400
+
 char tms_patterns[0x400] = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, /*  DB 000H, " " color 0 (0x00)*/
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, /*  DB 001H, " "               */
@@ -164,3 +169,5 @@ char tms_g1_colors[32] = {
   0xe1  /* 31 f8-ff */
 };
 
+#define TMS_G1_COLORS_LEN 32
+#endif //TMS_PATTERNS_H
