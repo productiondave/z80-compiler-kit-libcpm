@@ -152,7 +152,9 @@ bool draw_snake(Snake *s) {
 }
 
 void main() {
+  uint8_t i = 0;
   tms_init_mc(BLACK, DARK_YELLOW, false, false);
+
   running = true;
   srand(seed);
   won = false;
@@ -160,10 +162,14 @@ void main() {
   dir = EAST;
   draw_snake(snake);
   apple = new_apple();
+  tms_wait();
   tms_mcflush(tms_buf);
 
+#ifndef NABU
   crlf();
   puts("Press SPACE to play...\r\n");
+#endif
+
   while (cpm_dc_in() != ' ') {
     ++seed;
   }
@@ -210,6 +216,7 @@ void main() {
           fatal("CRASHED INTO TAIL");
         }
       }
+      tms_wait();
       tms_mcflush(tms_buf);
       gamespeed = GAME_SPEED;
       if (won && snake->grow == 0)
