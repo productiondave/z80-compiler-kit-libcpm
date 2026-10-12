@@ -130,11 +130,13 @@ void tms_plot_g2(uint8_t x, uint8_t y, uint8_t fg, uint8_t bg);
 /* plot a single fat pixel in multi color mode.  Returns true if the pixel at
  * the given location was greater than BLACK
  *
+ * if direct = true then also send the pixel to the VDP RAM
+ *
  * The original version of this function was taken from:
  * https://github.com/michalin/TMS9918_Arduino before being modified to work
  * with the Fuzix-Compiler-Kit and the z80-retro-libcpm assembly routines.
  */
-bool tms_plot_mc(uint8_t x, uint8_t y, uint8_t c);
+bool tms_plot_mc(uint8_t x, uint8_t y, uint8_t c, bool direct);
 
 /* wait for vsync and return status of vdp */
 extern uint8_t tms_wait();
@@ -143,7 +145,6 @@ extern uint8_t tms_status;
 /* flush buffer to VDP for the different modes */
 extern void tms_g1flush(char *buf);
 extern void tms_g2flush(char *buf);
-extern void tms_mcflush(char *buf);
 extern void tms_txtflush(char *buf);
 
 /* Load a tile pattern table into the VDP */

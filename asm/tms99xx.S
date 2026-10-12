@@ -32,7 +32,6 @@
   .export _tms_wait
   .export _tms_g1flush
   .export _tms_g2flush
-  .export _tms_mcflush
   .export _tms_txtflush
 
 #ifndef NABU
@@ -99,12 +98,6 @@ _tms_r_addr:
 _tms_put:
   ld    a,l
   out   (IO_TMSRAM),a
-  push  hl
-  pop   hl
-  push  hl
-  pop   hl
-  push  hl
-  pop   hl
   ret
 
 ; uint8_t tms_get();
@@ -112,12 +105,6 @@ _tms_get:
   in    a,(IO_TMSRAM)
   ld    l,a
   ld    h,0
-  push  hl
-  pop   hl
-  push  hl
-  pop   hl
-  push  hl
-  pop   hl
   ret
 
 ; uint8_t tms_wait();
@@ -165,14 +152,6 @@ _tms_txtflush:
   push  bc
   ld    de, 0x800
   ld    bc, 960
-  jp    tms_write_fast
-
-; void tms_mcflush(char *buf);
-; make sure to run tms_wait first
-_tms_mcflush:
-  push  bc
-  ld    de,0x800
-  ld    bc,0x600
 
   ;jp    tms_write_fast
   ; FALL THROUGH

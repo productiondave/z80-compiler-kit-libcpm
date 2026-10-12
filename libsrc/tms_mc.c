@@ -41,7 +41,10 @@ void init_mc_nt()
 
 void tms_init_mc(uint8_t fg, uint8_t bg, bool largesp, bool mag)
 {
+  size_t i;
   uint8_t sprite_flags = 0;
+  uint8_t *p;
+
   sprite_flags |= largesp << 1;
   sprite_flags |= mag << 0;
 
@@ -73,13 +76,24 @@ void tms_init_mc(uint8_t fg, uint8_t bg, bool largesp, bool mag)
 #ifdef NABU
   ei();
 #endif
+  // Flush the initial black screen slowly by doing half the screen each frame over two frames.
+  tms_w_addr(tms_patt_tbl);
+  p = (uint8_t*)tms_buf;
   tms_wait();
-  tms_mcflush(tms_buf);
+  for (i=0; i<0x300; ++i) {
+    tms_put(*p++);
+  }
+  tms_wait();
+  for (i=0; i<0x300; ++i) {
+    tms_put(*p++);
+  }
 }
 
 // Returns true if a colision with an existing pixel in the buffer was found and the value
-// of the existing pixel was not TRANSPARENT or BLACK
-bool tms_plot_mc(uint8_t x, uint8_t y, uint8_t c)
+// of the existing pixel was not TRANSPARENT or BLACK.  If direct = true, then also write
+// the new pixel to vram.
+// Collisions are tracked in a shadow buffer in system memory.
+bool tms_plot_mc(uint8_t x, uint8_t y, uint8_t c, bool direct)
 {
   uint16_t addr;
   uint8_t dot;
@@ -91,11 +105,17 @@ bool tms_plot_mc(uint8_t x, uint8_t y, uint8_t c)
   if (x & 1) {// Odd columns
     if ((dot & 0x0F) > BLACK)
       collide = true;
-    tms_buf[addr] = (dot & 0xF0) + (c & 0x0F);
+    dot = (dot & 0xF0) + (c & 0x0F);
   } else {
     if (((dot & 0xF0) >> 4) > BLACK)
       collide = true;
-    tms_buf[addr] = (dot & 0x0F) + (c << 4);
+    dot = (dot & 0x0F) + (c << 4);
+  }
+  tms_buf[addr] = dot;
+
+  if (direct) {
+    tms_w_addr(tms_patt_tbl + addr);
+    tms_put(dot);
   }
   return collide;
 }

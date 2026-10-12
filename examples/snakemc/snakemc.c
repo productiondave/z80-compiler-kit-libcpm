@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <tms.h>
 
 #define GRID_W 64
@@ -78,10 +79,11 @@ void victory() {
 
 Vec2 *new_apple() {
   bool taken = true;
+  tms_wait();
   while (taken) {
     apple_buf.x = (rand() & 0xFF) % GRID_W;
     apple_buf.y = (rand() & 0xFF) % GRID_H;
-    if (!tms_plot_mc(apple_buf.x, apple_buf.y, LIGHT_GREEN))
+    if (!tms_plot_mc(apple_buf.x, apple_buf.y, LIGHT_GREEN, true))
       taken = false;
   }
   return &apple_buf;
@@ -145,10 +147,11 @@ void move_snake(Snake *s, uint8_t dir) {
 }
 
 bool draw_snake(Snake *s) {
-  tms_plot_mc(s->tail->x, s->tail->y, BLACK);
-  tms_plot_mc(s->neck->x, s->neck->y, MAGENTA);
-  tms_plot_mc(s->body->x, s->body->y, DARK_RED);
-  return tms_plot_mc(s->head->x, s->head->y, CYAN);
+  tms_wait();
+  tms_plot_mc(s->tail->x, s->tail->y, BLACK, true);
+  tms_plot_mc(s->neck->x, s->neck->y, MAGENTA, true);
+  tms_plot_mc(s->body->x, s->body->y, DARK_RED, true);
+  return tms_plot_mc(s->head->x, s->head->y, CYAN, true);
 }
 
 void main() {
@@ -162,8 +165,6 @@ void main() {
   dir = EAST;
   draw_snake(snake);
   apple = new_apple();
-  tms_wait();
-  tms_mcflush(tms_buf);
 
 #ifndef NABU
   crlf();
@@ -216,8 +217,8 @@ void main() {
           fatal("CRASHED INTO TAIL");
         }
       }
-      tms_wait();
-      tms_mcflush(tms_buf);
+      // tms_wait();
+      // tms_mcflush(tms_buf);
       gamespeed = GAME_SPEED;
       if (won && snake->grow == 0)
         victory();
