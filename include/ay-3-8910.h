@@ -126,6 +126,11 @@ extern void ay_write(uint8_t reg, uint8_t val);
 extern uint8_t ay_read(uint8_t reg);
 
 
+/* Write a value to the AY REG port */
+extern void ay_wr_reg(uint8_t val);
+/* Read a value form the AY DATA port */
+extern uint8_t ay_rd_data();
+
 /* Pay a note on a given channel with a fade out delay.  If delay is zero do
  * not apply envelope shape.
  */

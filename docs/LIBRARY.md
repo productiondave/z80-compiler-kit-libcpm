@@ -333,6 +333,10 @@ registers.  It's best to just look at the header file to know what these are.
     - void ay_play_note_delay(uint8_t key, uint8_t channel, uint16_t delay);
         - Play a specific note on a specific channel with a decay period determined
           by delay
+    - void ay_wr_reg(uint8_t val);
+        - Low level write value to the AY reg IO port.
+    - uint8_t ay_rd_data();
+        - Low level read value from the AY Data IO port.
 
 ### AY-NOTES
 
@@ -366,5 +370,24 @@ Pseudo random number generator.
     - void srand(uint16_t seed);
     - uint16_t rand();
     - uint8_t fastrand(); much faster but less effective random number generator
+
+## NABU Retronet
+
+The NABU Retronet Internet adapter provides some TCP functionality along with
+other related file tools.  This library currently implements the TCP features
+which could be used for Game Design.
+
+    - uint8_t rn_TCPOpen(uint8_t hostnameLen, char *hostname, uint16_t port,
+                         uint8_t fileHandle);
+
+    - void rn_TCPHandleClose(uint8_t fileHandle);
+
+    - int32_t rn_TCPHandleSize(uint8_t fileHandle);
+
+    - int32_t rn_TCPHandleRead(uint8_t tcpHandle, uint8_t *buffer,
+                               uint16_t bufferOffset, uint16_t readLength);
+
+    - int32_t rn_TCPHandleWrite(uint8_t tcpHandle, uint16_t dataOffset,
+                                uint16_t dataLen, uint8_t *data);
 
 <!-- vim: set ft=markdown tw=80 cc=80: -->

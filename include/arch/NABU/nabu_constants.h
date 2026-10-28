@@ -10,6 +10,8 @@
 #define IO_PORTA               0x0E
 #define IO_PORTB               0x0F
 
-#define INT_MASK_KEYBOARD      0x20
 #define INT_MASK_VDP           0x10
+#define INT_MASK_KEYBOARD      0x20
+#define INT_MASK_HCCATX        0x40
+#define INT_MASK_HCCARX        0x80
 

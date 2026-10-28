@@ -1,10 +1,15 @@
 # Clang is no actually used to compile anything in this repo.
 # These settings are for when you are using clang for linting etc.
-
+-D
+NABU
 -I
 include
 -I
 include/arch/RETRO/
+-I
+include/arch/NOUVEAU/
+-I
+include/arch/NABU/
 -I
 /opt/fcc/lib/z80/include
 -nostdlib

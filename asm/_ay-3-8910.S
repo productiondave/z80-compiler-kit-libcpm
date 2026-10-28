@@ -28,6 +28,8 @@
 
   .export _ay_write
   .export _ay_read
+  .export _ay_wr_reg
+  .export _ay_rd_data
 
   .code
 
@@ -60,3 +62,15 @@ _ay_read:
   ld    h,0
   ret
 
+; void ay_wr_reg(uint8_t val);
+_ay_wr_reg:
+  ld    a,l
+  out   (IO_AYREG),a
+  ret
+
+; uint8_t ay_rd_data();
+_ay_rd_data:
+  in    a,(IO_AYDATA)
+  ld    l,a
+  ld    h,0
+  ret

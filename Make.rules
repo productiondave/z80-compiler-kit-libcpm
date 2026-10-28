@@ -14,17 +14,21 @@ BUILD_DIR=$(TOP)/build/arch/$(ARCH)
 # can't use BUILD_DIR here because examples might override it.
 LDLIBS=$(TOP)/build/arch/$(ARCH)/libcpm.a /opt/fcc/lib/z80/libz80.a
 
-SRC_S=$(wildcard $(TOP)/asm/*.S)
-SRC_s=$(patsubst $(TOP)/asm/%.o, $(BUILD_DIR)/%.s, $(SRC_S))
-OBJ_S=$(patsubst $(TOP)/asm/%.S, $(BUILD_DIR)/%.o, $(SRC_S))
+SRC_S    = $(wildcard $(TOP)/asm/*.S)
+ARCH_S   = $(wildcard $(TOP)/arch/$(ARCH)/asm/*.S)
+OBJ_S    = $(patsubst $(TOP)/asm/%.S,                   $(BUILD_DIR)/%.o, $(SRC_S))
+OBJ_ARCH_S = $(patsubst $(TOP)/arch/$(ARCH)/asm/%.S,    $(BUILD_DIR)/%.o, $(ARCH_S))
 
-SRC_C=$(wildcard $(TOP)/libsrc/*.c)
-OBJ_C=$(patsubst $(TOP)/libsrc/%.c, $(BUILD_DIR)/%.o, $(SRC_C))
+SRC_C    = $(wildcard $(TOP)/libsrc/*.c)
+ARCH_C   = $(wildcard $(TOP)/arch/$(ARCH)/libsrc/*.c)
+OBJ_C    = $(patsubst $(TOP)/libsrc/%.c,                $(BUILD_DIR)/%.o, $(SRC_C))
+OBJ_ARCH_C = $(patsubst $(TOP)/arch/$(ARCH)/libsrc/%.c, $(BUILD_DIR)/%.o, $(ARCH_C))
 
 OBJS=\
 		 $(OBJ_S) \
-		 $(OBJ_C)
-
+		 $(OBJ_ARCH_S) \
+		 $(OBJ_C) \
+		 $(OBJ_ARCH_C)
 
 .PHONY: all world
 
@@ -33,6 +37,14 @@ all::
 $(BUILD_DIR)/%.s: $(TOP)/asm/%.S
 	@mkdir -p $$(dirname $@)
 	$(CPP) $(CPPFLAGS) -o $@ $^
+
+$(BUILD_DIR)/%.s: $(TOP)/arch/$(ARCH)/asm/%.S
+	@mkdir -p $$(dirname $@)
+	$(CPP) $(CPPFLAGS) -o $@ $^
+
+$(BUILD_DIR)/%.o: $(TOP)/arch/$(ARCH)/libsrc/%.c
+	@mkdir -p $$(dirname $@)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $^
 
 $(BUILD_DIR)/%.o: $(TOP)/libsrc/%.c
 	@mkdir -p $$(dirname $@)

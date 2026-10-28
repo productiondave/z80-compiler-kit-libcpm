@@ -25,8 +25,6 @@
 ;****************************************************************************
 
 
-#ifdef NABU
-
 #include "io.h"
 #include "nabu_constants.h"
 
@@ -98,5 +96,3 @@ isrVdp:
 origint:                  .ds 1
 _tms_is_ready:            .ds 1
 _tms_status:              .ds 1
-
-#endif
