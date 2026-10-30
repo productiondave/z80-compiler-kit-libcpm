@@ -37,6 +37,11 @@
 #ifndef _NABU_RETRONET_H
 #define _NABU_RETRONET_H
 #include <stdint.h>
+#include <nabu_hcca.h> /* for hcca_rd_block() and hcca_rd_resp() */
+
+/* Note: the HCCA holds a single byte and the adapter streams data back to back,
+ * so reading a payload in C is too slow and loses bytes.  Use hcca_rd_block()
+ * for any bulk read.  rn_TCPHandleRead() already does. */
 
 /**************************************************************************
  * Connects to the host and returns a file handle that will be used for all file

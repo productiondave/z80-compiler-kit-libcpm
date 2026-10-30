@@ -35,12 +35,8 @@
 #include <nabu_constants.h>
 #include <nabu_hcca.h>
 #include <stdint.h>
-#include <stdlib.h>
 
 uint8_t _rnFS_INT_BACKUP = 0;
-volatile uint8_t _rxBuffer[256] = {0};
-volatile uint8_t _rxBufferReadPos = 0;
-volatile uint8_t _rxBufferWritePos = 0;
 
 void hcca_DiFocusInterrupts() {
   di();
@@ -129,20 +125,10 @@ int16_t hcca_DiRdInt16() {
   return (int16_t)hcca_DiRdByte() | ((int16_t)hcca_DiRdByte() << 8);
 }
 
+// Unlike NABU-LIB, this is an asm loop: the HCCA holds a single byte, so a C
+// loop is too slow and loses bytes.  Returns early if a byte never arrives.
 void hcca_DiRdBytes(uint16_t offset, uint16_t bufferLen, uint8_t *buffer) {
-
-  uint8_t *start = buffer + offset;
-  uint8_t *end = start + bufferLen;
-
-  ay_wr_reg(IO_PORTB);
-  while (start != end) {
-
-    while (ay_rd_data() & 0x02)
-      ;
-    *start = hcca_read();
-
-    start++;
-  }
+  hcca_rd_block(buffer + offset, bufferLen);
 }
 
 uint32_t hcca_DiRdUInt32() {
@@ -224,14 +210,11 @@ int32_t rn_TCPHandleRead(uint8_t tcpHandle, uint8_t *buffer,
                          uint16_t bufferOffset, uint16_t readLength) {
   // 0xd3
 
-  uint8_t *start = NULL;
-  uint8_t *end = NULL;
-  uint32_t toRead = 0;
-  size_t i;
+  int32_t toRead = 0;
+  uint16_t remaining;
+  uint8_t lenb[4];
 
   hcca_DiFocusInterrupts();
-
-  start = buffer + bufferOffset;
 
   hcca_DiWrByte(0xd3);
 
@@ -239,23 +222,12 @@ int32_t rn_TCPHandleRead(uint8_t tcpHandle, uint8_t *buffer,
 
   hcca_DiWrUInt16(readLength);
 
-  toRead = hcca_DiRdInt32();
-
+  // The adapter sends the payload straight after the length and the HCCA only
+  // holds one byte, so both must be read by a single asm routine.
+  remaining = hcca_rd_resp(buffer + bufferOffset, lenb);
+  toRead = *((int32_t *)lenb);
   if (toRead > 0) {
-
-    end = start + toRead;
-
-    do {
-      i = 0;
-      while ((ay_rd_data() & 0x02) & (++i < 65535))
-        ;
-      if (i == 0) break;
-      else *start = hcca_read();
-
-      start++;
-
-       _rxBufferReadPos++;
-    } while (start != end);
+    toRead -= remaining;
   }
 
   hcca_DiRestoreInterrupts();

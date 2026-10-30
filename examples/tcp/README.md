@@ -6,6 +6,5 @@ The example demonstrates the following features:
 
 - Open a TCP Connection
 - Read from TCP Connection
-- Write to TCP Connection
 - Close TCP Connection
 

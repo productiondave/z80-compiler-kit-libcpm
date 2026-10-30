@@ -373,9 +373,15 @@ Pseudo random number generator.
 
 ## NABU Retronet
 
+- [nabu_retronet.h](../include/nabu_retronet.h)
+- [nabu_hcca.h](../include/nabu_hcca.h)
+
 The NABU Retronet Internet adapter provides some TCP functionality along with
 other related file tools.  This library currently implements the TCP features
-which could be used for Game Design.
+which could be used for Game Design.  The implementation follows NABU-LIB
+(`RetroNET-FileStore.c`) so changes there are easy to compare against
+[nabu_retronet.c](../arch/NABU/libsrc/nabu_retronet.c).  See the
+[tcp example](../examples/tcp/tcp.c).
 
     - uint8_t rn_TCPOpen(uint8_t hostnameLen, char *hostname, uint16_t port,
                          uint8_t fileHandle);
@@ -389,5 +395,42 @@ which could be used for Game Design.
 
     - int32_t rn_TCPHandleWrite(uint8_t tcpHandle, uint16_t dataOffset,
                                 uint16_t dataLen, uint8_t *data);
+
+`rn_TCPOpen()` returns 0xFF on failure.  `rn_TCPHandleSize()` returns the number
+of bytes waiting to be read.  Data may arrive some time after connecting, so
+poll it before calling `rn_TCPHandleRead()`.  `rn_TCPHandleRead()` returns the
+number of bytes actually read.
+
+### HCCA access
+
+The adapter is accessed through the HCCA port.  The `hcca_Di*` functions in
+`nabu_retronet.c` keep the NABU-LIB names and behaviour.  Two routines in
+[nabu_hcca.S](../arch/NABU/asm/nabu_hcca.S) differ from NABU-LIB and are
+available to C programs:
+
+    - uint16_t hcca_rd_block(uint8_t *buf, uint16_t len);
+    - uint16_t hcca_rd_resp(uint8_t *buf, uint8_t *len);
+
+Both return the number of bytes *not* read (0 on success) and give up after
+about 65000 polls if a byte never arrives.  They do not disable interrupts or
+set the AY interrupt mask.  `hcca_Di*` calls handle this in the library.
+
+The HCCA holds only a **single byte**, and the adapter sends the payload
+straight after the length of a response.  C code between reads is too slow, so
+bytes are overwritten and lost, typically the first few bytes of the payload.
+For this reason:
+
+- `hcca_rd_resp()` reads the 4 byte length into `len[]` and then immediately
+  reads that many bytes into `buf`.  It is used by `rn_TCPHandleRead()`.
+- `hcca_rd_block()` is a tight loop for reading a known number of bytes.
+  `hcca_DiRdBytes()` uses it.
+
+### Compiler note
+
+The FUZIX compiler (fcc) can generate bad code for a `break` inside a `do/while`
+loop that uses a pointer which is incremented.  The stack ends up unbalanced and
+the program crashes when the function returns.  Avoid `break` in such loops
+(use a flag or a plain `while`), and check the generated assembly with
+`fcc -S` if a function crashes on return.
 
 <!-- vim: set ft=markdown tw=80 cc=80: -->
