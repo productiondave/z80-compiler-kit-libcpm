@@ -12,7 +12,8 @@ SUBDIRS = \
 					cpmdcout \
 					highres \
 					snakemc \
-					tmstxt
+					tmstxt \
+					tcp
 
 CLEAN_DIRS=$(SUBDIRS:%=clean-%)
 ALL_DIRS=$(SUBDIRS:%=all-%)

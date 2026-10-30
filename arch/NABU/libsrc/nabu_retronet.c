@@ -148,14 +148,20 @@ void hcca_DiRdBytes(uint16_t offset, uint16_t bufferLen, uint8_t *buffer) {
 uint32_t hcca_DiRdUInt32() {
 
   uint8_t ret[4];
-  hcca_DiRdBytes(0, 4, ret);
+  ret[0] = hcca_DiRdByte();
+  ret[1] = hcca_DiRdByte();
+  ret[2] = hcca_DiRdByte();
+  ret[3] = hcca_DiRdByte();
   return *((uint32_t *)ret);
 }
 
 int32_t hcca_DiRdInt32() {
 
   uint8_t ret[4];
-  hcca_DiRdBytes(0, 4, ret);
+  ret[0] = hcca_DiRdByte();
+  ret[1] = hcca_DiRdByte();
+  ret[2] = hcca_DiRdByte();
+  ret[3] = hcca_DiRdByte();
   return *((int32_t *)ret);
 }
 
@@ -187,15 +193,19 @@ void rn_TCPHandleClose(uint8_t fileHandle) {
 
   // 0xd1
 
-  hcca_write(0xd1);
+  hcca_DiFocusInterrupts();
 
-  hcca_write(fileHandle);
+  hcca_DiWrByte(0xd1);
+
+  hcca_DiWrByte(fileHandle);
+
+  hcca_DiRestoreInterrupts();
 }
 
 int32_t rn_TCPHandleSize(uint8_t fileHandle) {
 
   // 0xd2
-  uint32_t t = 0;
+  int32_t t = 0;
 
   hcca_DiFocusInterrupts();
 
@@ -217,6 +227,7 @@ int32_t rn_TCPHandleRead(uint8_t tcpHandle, uint8_t *buffer,
   uint8_t *start = NULL;
   uint8_t *end = NULL;
   uint32_t toRead = 0;
+  size_t i;
 
   hcca_DiFocusInterrupts();
 
@@ -235,14 +246,15 @@ int32_t rn_TCPHandleRead(uint8_t tcpHandle, uint8_t *buffer,
     end = start + toRead;
 
     do {
-
-      while (ay_rd_data() & 0x02)
+      i = 0;
+      while ((ay_rd_data() & 0x02) & (++i < 65535))
         ;
-      *start = hcca_read();
+      if (i == 0) break;
+      else *start = hcca_read();
 
       start++;
 
-      _rxBufferReadPos++;
+       _rxBufferReadPos++;
     } while (start != end);
   }
 
@@ -251,10 +263,11 @@ int32_t rn_TCPHandleRead(uint8_t tcpHandle, uint8_t *buffer,
   return toRead;
 }
 
+
 int32_t rn_TCPHandleWrite(uint8_t tcpHandle, uint16_t dataOffset,
                           uint16_t dataLen, uint8_t *data) {
 
-  uint32_t wrote = 0;
+  int32_t wrote = 0;
   // 0xd4
   hcca_DiFocusInterrupts();
 
