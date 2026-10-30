@@ -41,5 +41,13 @@ extern void hcca_write(uint8_t val);
 /* Read a value from an AY register */
 extern uint8_t hcca_read();
 
+/* Read len bytes from the HCCA into buf with a tight loop (the HCCA holds only
+ * one byte, so C loops are too slow).  Returns the number of bytes NOT read. */
+extern uint16_t hcca_rd_block(uint8_t *buf, uint16_t len);
+
+/* Read a 4 byte length into len[], then immediately read that many bytes into
+ * buf with no gap (needed for RetroNET responses).  Returns bytes NOT read. */
+extern uint16_t hcca_rd_resp(uint8_t *buf, uint8_t *len);
+
 
 #endif //_HCCA_H
