@@ -69,6 +69,9 @@ init_nabu:
   ld    hl, isrVdp
   ld    (0xff00+6), hl
 
+  ;ld    hl, isrHccaRx
+  ;ld    (0xff00), hl
+
   ld    b,0x07
   ld    c,01111111b
   call  ay_write        ; configure PORTA for writing and port B for reading
@@ -92,6 +95,28 @@ isrVdp:
   ei
   reti
 
+;isrHccaRx:
+;  push  bc
+;  push  de
+;  push  hl
+;  push  af
+; 
+;  ld    bc, __rxBuffer+0
+;  ld    hl, (__rxBufferWritePos)
+;  ld    h, 0x00
+;  add   hl, bc
+;  in    a, (IO_HCCA)
+;  ld    (hl), a
+;  ld    a, (__rxBufferWritePos+0)
+;  inc   a
+;  ld    (__rxBufferWritePos+0), a
+; 
+;  pop   af
+;  pop   hl
+;  pop   de
+;  pop   bc
+;  ei
+;  reti
 
 origint:                  .ds 1
 _tms_is_ready:            .ds 1
