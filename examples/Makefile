@@ -30,7 +30,7 @@ CLEAN_DIRS=$(SUBDIRS:%=clean-%)
 ALL_DIRS=$(SUBDIRS:%=all-%)
 COPY_DIRS=$(SUBDIRS:%=copy-%)
 
-.PHONY: all clean $(CLEAN_DIRS) $(ALL_DIRS) $(COPY_DIRS)
+.PHONY: all clean copy-nabu $(CLEAN_DIRS) $(ALL_DIRS) $(COPY_DIRS)
 
 all:: $(ALL_DIRS)
 
@@ -49,3 +49,15 @@ $(CLEAN_DIRS):
 $(COPY_DIRS):
 	$(MAKE) -C $(@:copy-%=%) copy
 
+
+# Copy built NABU examples (uppercased names) to the NABU Internet Adapter
+# folder given by NABU_IA_DIR (see Make.default / Make.local).
+copy-nabu: all
+ifneq ($(ARCH),NABU)
+	$(error copy-nabu requires ARCH=NABU)
+endif
+	@mkdir -p "$(NABU_IA_DIR)"
+	@find "$(TOP)/build/arch/NABU/examples" -type f -name '*.com' | while read -r f; do \
+		dest="$(NABU_IA_DIR)/$$(basename "$$f" | tr '[:lower:]' '[:upper:]')"; \
+		cp "$$f" "$$dest" && echo "Copied: $$f -> $$dest"; \
+	done

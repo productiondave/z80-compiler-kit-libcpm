@@ -3,3 +3,7 @@ INSTALLDIR=$(HOME)/dev/libcpm
 #ARCH=RETRO
 #ARCH=NOUVEAU
 ARCH=NABU
+
+# Folder where the NABU Internet Adapter looks for CP/M programs.
+# Override in Make.local.
+NABU_IA_DIR=$(HOME)/Documents/NABU Internet Adapter/Store/CPM/C/0
