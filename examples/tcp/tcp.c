@@ -2,25 +2,24 @@
 /*
  * TCP example for the NABU Retronet Internet Adapter.
  *
- * Opens a TCP connection to a server, waits for the server to send some data,
- * reads it into a buffer, prints it and closes the connection.
- *
- * The server is expected to send a short message (for example "hellorld") as
- * soon as a client connects.  Change `hostname` and the port below to match
- * the machine running your server.
+ * Opens a TCP connection to an echo server.
+ * - Reads a string from cpm (cpm_readstr)
+ * - writes it to the TCP connection
+ * - reads the reply
+ * - echos reply.
  */
 #include <nabu_retronet.h>
-#include <ay-3-8910.h>
-#include <nabu_constants.h>
 #include <cpm.h>
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define BUFFER_LEN 256
 
+//Change `hostname` and the port below to match the machine running your server.
 char *hostname = "127.0.0.1";
+#define PORT 3001
+
 uint8_t hostnamelen = 0;
 
 char *rcv_buffer = NULL;
@@ -48,7 +47,7 @@ void main()
 
   /* Open the connection.  The last argument is the handle to use, 0xFF asks the
    * adapter to pick a free one for us. */
-  handle = rn_TCPOpen(hostnamelen, hostname, 3001, 0xFF);
+  handle = rn_TCPOpen(hostnamelen, hostname, PORT, 0xFF);
   if (handle != 0xFF) {
     printf("Connected.  Got handle: %d\n", handle);
     printf("type 'quit' to exit\n");

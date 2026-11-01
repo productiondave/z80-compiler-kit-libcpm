@@ -35,6 +35,7 @@
 #include <nabu_constants.h>
 #include <nabu_hcca.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 uint8_t _rnFS_INT_BACKUP = 0;
 
@@ -65,33 +66,6 @@ void hcca_DiWrUInt16(uint16_t val) {
   hcca_DiWrByte((val >> 8) & 0xff);
 }
 
-void hcca_DiWrInt16(int16_t val) {
-
-  hcca_DiWrByte(val & 0xff);
-  hcca_DiWrByte((val >> 8) & 0xff);
-}
-
-void hcca_DiWrUInt32(uint32_t val) {
-
-  hcca_DiWrByte(val & 0xff);
-  hcca_DiWrByte((val >> 8) & 0xff);
-  hcca_DiWrByte((val >> 16) & 0xff);
-  hcca_DiWrByte((val >> 24) & 0xff);
-}
-
-void hcca_DiWrInt32(int32_t val) {
-
-  hcca_DiWrByte(val & 0xff);
-  hcca_DiWrByte((val >> 8) & 0xff);
-  hcca_DiWrByte((val >> 16) & 0xff);
-  hcca_DiWrByte((val >> 24) & 0xff);
-}
-
-void hcca_DiWrString(uint8_t *str) {
-  while (*str != 0) {
-    hcca_DiWrByte(*str++);
-  }
-}
 
 void hcca_DiWrBytes(uint16_t offset, uint16_t length, uint8_t *bytes) {
 
@@ -113,32 +87,6 @@ uint8_t hcca_DiRdByte() {
   while (ay_rd_data() & 0x02)
     ;
   return hcca_read();
-}
-
-uint16_t hcca_DiRdUInt16() {
-
-  return (uint16_t)hcca_DiRdByte() | ((uint16_t)hcca_DiRdByte() << 8);
-}
-
-int16_t hcca_DiRdInt16() {
-
-  return (int16_t)hcca_DiRdByte() | ((int16_t)hcca_DiRdByte() << 8);
-}
-
-// Unlike NABU-LIB, this is an asm loop: the HCCA holds a single byte, so a C
-// loop is too slow and loses bytes.  Returns early if a byte never arrives.
-void hcca_DiRdBytes(uint16_t offset, uint16_t bufferLen, uint8_t *buffer) {
-  hcca_rd_block(buffer + offset, bufferLen);
-}
-
-uint32_t hcca_DiRdUInt32() {
-
-  uint8_t ret[4];
-  ret[0] = hcca_DiRdByte();
-  ret[1] = hcca_DiRdByte();
-  ret[2] = hcca_DiRdByte();
-  ret[3] = hcca_DiRdByte();
-  return *((uint32_t *)ret);
 }
 
 int32_t hcca_DiRdInt32() {

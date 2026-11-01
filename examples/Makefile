@@ -1,4 +1,9 @@
-SUBDIRS = \
+TOP=..
+include $(TOP)/Make.default
+-include $(TOP)/Make.local
+
+# Examples built for every ARCH
+SUBDIRS_COMMON = \
 					fileio \
 					malloc \
 					demo \
@@ -12,8 +17,14 @@ SUBDIRS = \
 					cpmdcout \
 					highres \
 					snakemc \
-					tmstxt \
-					tcp
+					tmstxt
+
+# Examples only built when ARCH matches.  Add new gated examples here.
+SUBDIRS_NABU = tcp
+SUBDIRS_RETRO =
+SUBDIRS_NOUVEAU =
+
+SUBDIRS = $(SUBDIRS_COMMON) $(SUBDIRS_$(ARCH))
 
 CLEAN_DIRS=$(SUBDIRS:%=clean-%)
 ALL_DIRS=$(SUBDIRS:%=all-%)
