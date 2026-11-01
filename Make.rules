@@ -16,13 +16,13 @@ LDLIBS=$(TOP)/build/arch/$(ARCH)/libcpm.a /opt/fcc/lib/z80/libz80.a
 
 SRC_S    = $(wildcard $(TOP)/asm/*.S)
 ARCH_S   = $(wildcard $(TOP)/arch/$(ARCH)/asm/*.S)
-OBJ_S    = $(patsubst $(TOP)/asm/%.S,                   $(BUILD_DIR)/%.o, $(SRC_S))
-OBJ_ARCH_S = $(patsubst $(TOP)/arch/$(ARCH)/asm/%.S,    $(BUILD_DIR)/%.o, $(ARCH_S))
+OBJ_S    = $(patsubst $(TOP)/asm/%.S,$(BUILD_DIR)/%.o, $(SRC_S))
+OBJ_ARCH_S = $(patsubst $(TOP)/arch/$(ARCH)/asm/%.S,$(BUILD_DIR)/%.o, $(ARCH_S))
 
 SRC_C    = $(wildcard $(TOP)/libsrc/*.c)
 ARCH_C   = $(wildcard $(TOP)/arch/$(ARCH)/libsrc/*.c)
-OBJ_C    = $(patsubst $(TOP)/libsrc/%.c,                $(BUILD_DIR)/%.o, $(SRC_C))
-OBJ_ARCH_C = $(patsubst $(TOP)/arch/$(ARCH)/libsrc/%.c, $(BUILD_DIR)/%.o, $(ARCH_C))
+OBJ_C    = $(patsubst $(TOP)/libsrc/%.c,$(BUILD_DIR)/%.o, $(SRC_C))
+OBJ_ARCH_C = $(patsubst $(TOP)/arch/$(ARCH)/libsrc/%.c,$(BUILD_DIR)/%.o, $(ARCH_C))
 
 OBJS=\
 		 $(OBJ_S) \

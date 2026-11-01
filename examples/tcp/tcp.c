@@ -1,3 +1,4 @@
+// vim: set ts=2 sw=2 et:
 /*
  * TCP example for the NABU Retronet Internet Adapter.
  *
@@ -13,70 +14,86 @@
 #include <nabu_constants.h>
 #include <cpm.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define BUFFER_LEN 1024
+#define BUFFER_LEN 256
+
+char *hostname = "127.0.0.1";
+uint8_t hostnamelen = 0;
+
+char *rcv_buffer = NULL;
+char *snd_buffer = NULL;
+uint8_t bytes_to_send = 0;
+
+/* Handle for the connection.  0xFF means "no connection" and is also what
+ * rn_TCPOpen() returns on failure. */
+uint8_t handle = 0xFF;
+
+int32_t to_read = 0;    /* bytes waiting on the connection */
+int32_t bytes_read = 0; /* bytes actually read */
+size_t delay = 0;       /* poll counter */
 
 void main()
 {
-  /* IP address (or hostname) of the server and its length.  The adapter wants
-   * the length passed separately because the name is not NUL terminated on the
-   * wire. */
-  char *hostname = "192.168.0.230";
-  uint8_t hostnamelen = 0;
-
-  char *buffer = NULL;
-
-  /* Handle for the connection.  0xFF means "no connection" and is also what
-   * rn_TCPOpen() returns on failure. */
-  uint8_t handle = 0xFF;
-
-  int32_t to_read = 0;    /* bytes waiting on the connection */
-  int32_t bytes_read = 0; /* bytes actually read */
-  size_t delay = 0;       /* poll counter */
-
   /* Receive buffer, cleared so that anything we print is NUL terminated. */
-  buffer = malloc(BUFFER_LEN);
-  memset(buffer, 0, BUFFER_LEN);
+  rcv_buffer = malloc(BUFFER_LEN);
+  snd_buffer = malloc(BUFFER_LEN);
+  memset(rcv_buffer, 0, BUFFER_LEN);
+  memset(snd_buffer, 0, BUFFER_LEN);
   hostnamelen = strlen(hostname);
 
-  printf("Connecting\n");
+  printf("Connecting to echo server...\n");
 
   /* Open the connection.  The last argument is the handle to use, 0xFF asks the
    * adapter to pick a free one for us. */
   handle = rn_TCPOpen(hostnamelen, hostname, 3001, 0xFF);
   if (handle != 0xFF) {
     printf("Connected.  Got handle: %d\n", handle);
+    printf("type 'quit' to exit\n");
 
-    /* Data does not necessarily arrive straight away.  Poll the handle until
-     * the adapter reports that some bytes are waiting, or give up after a
-     * while. */
-    for (delay=0; delay<65535; ++delay) {
-      to_read = rn_TCPHandleSize(handle);
-      if (to_read > 0) break;
-    }
-    printf("rn_TCPHandleSize returned %d\n", to_read);
+    while (true) {
+      snd_buffer[0] = 8;
+      cpm_readstr(snd_buffer);
+      bytes_to_send = snd_buffer[1];
+      /* cpm_readstr does not NUL terminate; do it so stale data from a longer
+       * previous line is not seen. */
+      snd_buffer[2 + bytes_to_send] = '\0';
+      printf("[->] %s\n", &snd_buffer[2]);
+      if (strcmp(&snd_buffer[2], "quit") == 0)  {
+        rn_TCPHandleClose(handle);
+        return;
+      }
+      // cpm_readstr records the number of bytes entered in buf[1], the data starts at buf[2]
+      // Thats why data_offset below is set to 2.
+      rn_TCPHandleWrite(handle, 2, bytes_to_send, (uint8_t*)snd_buffer);
 
-    /* Read everything that is waiting.  Arguments are: handle, buffer, offset
-     * into the buffer to start writing at, and the number of bytes to read.
-     * The return value is the number of bytes read, 0 if there was none, or a
-     * negative value if the server disconnected. */
-    bytes_read = rn_TCPHandleRead(handle, (uint8_t*)buffer, 0, to_read);
+      /* The echo may not have arrived yet.  Poll the handle until some bytes
+       * are waiting (or give up), then read only what is there. */
+      to_read = 0;
+      for (delay = 0; delay < 65535; ++delay) {
+        to_read = rn_TCPHandleSize(handle);
+        if (to_read != 0) break;
+      }
+      if (to_read < 0) {
+        printf("TCP Handle %d disconnected\n", handle);
+        break;
+      }
+      if (to_read > BUFFER_LEN - 1) to_read = BUFFER_LEN - 1;
 
-    if (bytes_read > 0) {
-      /* Success.  Terminate the data so it can be printed as a string. */
-      buffer[to_read] = '\0';
-      printf("Read %d bytes from TCP Handle %d\n", to_read, handle);
-      printf("Buffer contents:\n");
-      printf("%s\n", buffer);
-      rn_TCPHandleClose(handle);
-      return;
-    } else if (bytes_read == 0) {
-      /* Connected, but nothing arrived in time. */
-      printf("No data available on TCP Handle %d\n", handle);
-    } else {
-      printf("TCP Handle %d disconnected (error %d)\n", handle, bytes_read);
+      bytes_read = rn_TCPHandleRead(handle, (uint8_t*)rcv_buffer, 0, (uint16_t)to_read);
+
+      if (bytes_read > 0) {
+        /* Success.  Terminate the data so it can be printed as a string. */
+        rcv_buffer[bytes_read] = '\0';
+        printf("[<-] %s\n", rcv_buffer);
+      } else if (bytes_read == 0) {
+        /* Connected, but nothing arrived in time. */
+        printf("No data available on TCP Handle %d\n", handle);
+      } else {
+        printf("TCP Handle %d disconnected (error %d)\n", handle, bytes_read);
+      }
     }
   } else {
     /* Could not reach the server, so there is no handle to close. */
