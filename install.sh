@@ -31,14 +31,20 @@ cp -fv build/arch/NABU/crt0.o $1/lib/arch/NABU/
 cp -rv include/* $1/include/
 
 sed "s#INSTALLDIR#$1#" arch/NOUVEAU/skeleton/Makefile.template > arch/NOUVEAU/skeleton/Makefile
+sed "s#INSTALLDIR#$1#" arch/NOUVEAU/skeleton/compile_flags.template > arch/NOUVEAU/skeleton/compile_flags.txt
 cp -rv arch/NOUVEAU/skeleton/Makefile $1/examples/arch/NOUVEAU/skeleton/
 cp -rv arch/NOUVEAU/skeleton/main.c $1/examples/arch/NOUVEAU/skeleton/
+cp -rv arch/NOUVEAU/skeleton/compile_flags.txt $1/examples/arch/NOUVEAU/skeleton/
 
 sed "s#INSTALLDIR#$1#" arch/RETRO/skeleton/Makefile.template > arch/RETRO/skeleton/Makefile
+sed "s#INSTALLDIR#$1#" arch/RETRO/skeleton/compile_flags.template > arch/RETRO/skeleton/compile_flags.txt
 cp -rv arch/RETRO/skeleton/Makefile $1/examples/arch/RETRO/skeleton/
 cp -rv arch/RETRO/skeleton/main.c $1/examples/arch/RETRO/skeleton/
+cp -rv arch/RETRO/skeleton/compile_flags.txt $1/examples/arch/RETRO/skeleton/
 
 sed "s#INSTALLDIR#$1#" arch/NABU/skeleton/Makefile.template > arch/NABU/skeleton/Makefile
+sed "s#INSTALLDIR#$1#" arch/NABU/skeleton/compile_flags.template > arch/NABU/skeleton/compile_flags.txt
 cp -rv arch/NABU/skeleton/Makefile $1/examples/arch/NABU/skeleton/
 cp -rv arch/NABU/skeleton/main.c $1/examples/arch/NABU/skeleton/
+cp -rv arch/NABU/skeleton/compile_flags.txt $1/examples/arch/NABU/skeleton/
 

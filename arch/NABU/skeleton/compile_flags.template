@@ -1,0 +1,16 @@
+# Clang is no actually used to compile anything in this repo.
+# These settings are for when you are using clang for linting etc.
+-D
+NABU
+-I
+include
+-I
+INSTALLDIR/include/arch/NABU/
+-I
+INSTALLDIR/include
+-I
+/opt/fcc/lib/z80/include
+-nostdlib
+-fno-builtin
+-Wno-pointer-to-int-cast
+-Wno-main-return-type

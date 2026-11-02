@@ -58,15 +58,16 @@ void main()
       bytes_to_send = snd_buffer[1];
       /* cpm_readstr does not NUL terminate; do it so stale data from a longer
        * previous line is not seen. */
-      snd_buffer[2 + bytes_to_send] = '\0';
-      printf("[->] %s\n", &snd_buffer[2]);
+      snd_buffer[2 + bytes_to_send] = '\n';
+      snd_buffer[3 + bytes_to_send] = '\0';
+      printf("[->] %s", &snd_buffer[2]);
       if (strcmp(&snd_buffer[2], "quit") == 0)  {
         rn_TCPHandleClose(handle);
         return;
       }
       // cpm_readstr records the number of bytes entered in buf[1], the data starts at buf[2]
       // Thats why data_offset below is set to 2.
-      rn_TCPHandleWrite(handle, 2, bytes_to_send, (uint8_t*)snd_buffer);
+      rn_TCPHandleWrite(handle, 2, bytes_to_send+1, (uint8_t*)snd_buffer);
 
       /* The echo may not have arrived yet.  Poll the handle until some bytes
        * are waiting (or give up), then read only what is there. */
