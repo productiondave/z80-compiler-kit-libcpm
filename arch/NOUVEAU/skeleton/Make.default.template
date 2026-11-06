@@ -1,0 +1,11 @@
+LIBCPM=INSTALLDIR
+CC=/opt/fcc/bin/fcc
+AS=/opt/fcc/bin/asz80
+LD=/opt/fcc/bin/ldz80
+CPP=/usr/bin/cpp -undef -nostdinc
+
+ARCH=NOUVEAU
+APPNAME=main
+BUILD_DIR=build
+
+-include Make.local
