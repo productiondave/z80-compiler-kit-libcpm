@@ -139,7 +139,6 @@ void wait(uint8_t d) {
 
 int main()
 {
-  printf("\r\n");
   ay_write(7,0x7E);       //enable channel A tone only 0b01111110
   ay_write(8,0x1F);         //set channel A volume to 12
   tms_init_g1(WHITE, BLACK, false, false); // need this to ensure VPD interrupt is set
@@ -160,7 +159,6 @@ int main()
     ay_play_note_delay(notes[t], 0, 0);
     wait(waits[t]);
   }
-  printf("\r\n");
   ay_write(8,0);      // silence channel A
 
   tms_puts_xy(2,8,"Short intermission");
